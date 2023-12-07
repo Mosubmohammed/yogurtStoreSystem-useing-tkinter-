@@ -83,7 +83,32 @@ class ItemsForm:
     def show(self):
         self.window.mainloop()
 
+
+class ItemsForm:
+    def __init__(self, items_list):
+        self.items_list = items_list
+        self.window = tk.Tk()  # Create a new Tkinter window
+        self.window.title('Items List')
+
+        self.label_title = ttk.Label(self.window, text='Items List', font=('Helvetica', 16, 'bold'))
+        self.label_title.pack()
+
+        for item in self.items_list:
+            formatted_item_name = f"{item['name']}"
+            formatted_item_price = f"${item['price']:.2f}"
+
+            label_item_name = ttk.Label(self.window, text=formatted_item_name, foreground='blue')
+            label_item_price = ttk.Label(self.window, text=formatted_item_price, foreground='green')
+
+            label_item_name.pack()
+            label_item_price.pack()
+
+
+    def show(self):
+        self.window.mainloop()
+
 LARGEFONT =("Verdana", 12)
+
 
 
 
@@ -102,16 +127,14 @@ class tkinterApp(tk.Tk):
         customers_acc = CustomersAcc()  # Create an instance of CustomersAcc
 
         for F in (StartPage, Page1, Page2, Page3, Page4, Page5):
-            frame = F(container, self, customers_acc)  # Pass customers_acc
+            if F == Page1:
+                frame = F(container, self, customers_acc)  # Pass customers_acc only
+            else:
+                frame = F(container, self, itemsList, customers_acc)  # Pass itemsList and customers_acc
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew")
-        self.geometry("300x318")
-        
-        self.show_frame(StartPage)
 
-    def show_frame(self, cont):
-        frame = self.frames[cont]
-        frame.tkraise()
+        self.show_frame(StartPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -119,15 +142,16 @@ class tkinterApp(tk.Tk):
 
         if cont == Page3:
             self.geometry("300x165")  # Adjust the height as needed for Page3
-        elif cont==Page1:
+        elif cont == Page1:
             self.geometry("300x330")
-        elif cont==Page2:
+        elif cont == Page2:
             self.geometry("300x200")
-        elif cont==StartPage:
+        elif cont == Page4:
+            self.geometry("250x400")
+        elif cont == StartPage:
             self.geometry("240x240")    
         else:
             self.geometry("300x318")
-            
 class StartPage(tk.Frame):
     def __init__(self, parent, controller, *args, **kwargs):
         tk.Frame.__init__(self, parent)
@@ -326,30 +350,6 @@ class Page3(tk.Frame):
             self.result_var.set('Item not found')
 
 
-class ItemsForm:
-    def __init__(self, items_list):
-        self.items_list = items_list
-        self.window = tk.Tk()  # Create a new Tkinter window
-        self.window.title('Items List')
-
-        self.label_title = ttk.Label(self.window, text='Items List', font=('Helvetica', 16, 'bold'))
-        self.label_title.pack()
-
-        for item in self.items_list:
-            formatted_item_name = f"{item['name']}"
-            formatted_item_price = f"${item['price']:.2f}"
-
-            label_item_name = ttk.Label(self.window, text=formatted_item_name, foreground='blue')
-            label_item_price = ttk.Label(self.window, text=formatted_item_price, foreground='green')
-
-            label_item_name.pack()
-            label_item_price.pack()
-
-        self.button_close = ttk.Button(self.window, text='Close', command=self.window.destroy)
-        self.button_close.pack()
-
-    def show(self):
-        self.window.mainloop()
 
 class Page4(tk.Frame):
     def __init__(self, parent, controller, items_list, *args, **kwargs):
@@ -357,6 +357,18 @@ class Page4(tk.Frame):
         label = ttk.Label(self, text="Menu", font=LARGEFONT)
         label.grid(row=0, column=4, padx=10, pady=10)
 
+        for index, item in enumerate(items_list, start=1):
+            formatted_item_name = f"{item['name']}"
+            formatted_item_price = f"${item['price']:.2f}"
+
+            label_item_name = ttk.Label(self, text=formatted_item_name, foreground='blue')
+            label_item_price = ttk.Label(self, text=formatted_item_price, foreground='green')
+
+            label_item_name.grid(row=index, column=4, padx=10, pady=5)
+            label_item_price.grid(row=index, column=5, padx=10, pady=5)
+
+        button_back = ttk.Button(self, text="Go Back", command=lambda: controller.show_frame(StartPage))
+        button_back.grid(row=len(items_list) + 1, column=4, columnspan=2, padx=10, pady=10)
     
 
 
