@@ -38,16 +38,19 @@ class CustomersAcc:
         return self.__password
 
 class LoginAccount(Customer):
-    def __init__(self, email, password):
+    def __init__(self, email, password, callback=None):
         super().__init__("", "", "", "", email, password)
+        self.callback = callback  # Store the callback function
 
-    def searchForCustomers(self, customers_acc, callback):
+    def searchForCustomers(self, customers_acc):
         for customer in customers_acc.customersList:
             if self.email == customer.email and self._Customer__password == customer._Customer__password:
                 messagebox.showinfo('Welcome', 'Welcome back!')
-                callback()  # Call the callback function after showing the messagebox
+                if self.callback:
+                    self.callback()  # Call the callback function if provided
                 return
         messagebox.showerror('Error', 'You don\'t have an account.')
+
 
 class ItemSearch:
     def __init__(self, items_list):
@@ -107,6 +110,14 @@ class ItemsForm:
     def show(self):
         self.window.mainloop()
 
+class Cart:
+    def __init__(self):
+        self.orderList = []
+
+    def add_item(self, item_name):
+        self.orderList.append(item_name)
+
+
 LARGEFONT =("Verdana", 12)
 
 
@@ -147,7 +158,9 @@ class tkinterApp(tk.Tk):
         elif cont == Page2:
             self.geometry("300x200")
         elif cont == Page4:
-            self.geometry("250x400")
+            self.geometry("250x500")
+        elif cont == Page5:
+            self.geometry("300x600")    
         elif cont == StartPage:
             self.geometry("240x240")    
         else:
@@ -279,7 +292,7 @@ class Page1(tk.Frame):
 
 
 class Page2(tk.Frame):
-    def __init__(self, parent, controller, customers_acc, *args, **kwargs):
+    def __init__(self, parent, controller, items_list, customers_acc, *args, **kwargs):
         tk.Frame.__init__(self, parent)
         self.customers_acc = customers_acc
         self.controller = controller
@@ -309,11 +322,13 @@ class Page2(tk.Frame):
     def login(self, entry_name, entry_password):
         email = entry_name.get()
         password = entry_password.get()
-        login_account = LoginAccount(email, password)
-        login_account.searchForCustomers(self.customers_acc, self.go_to_start_page)
+        login_account = LoginAccount(email, password, self.go_to_start_page)  # Pass the callback method
+        login_account.searchForCustomers(self.customers_acc)
 
     def go_to_start_page(self):
         self.controller.show_frame(StartPage)
+
+
 
 
 class Page3(tk.Frame):
@@ -374,10 +389,53 @@ class Page4(tk.Frame):
 
 
 class Page5(tk.Frame): 
-	def __init__(self, parent, controller, *args, **kwargs):
-		tk.Frame.__init__(self, parent)
-		label = ttk.Label(self, text ="Page 5", font = LARGEFONT)
-		label.grid(row = 0, column = 4, padx = 10, pady = 10) 
+    def __init__(self, parent, controller, items_list, customers_acc, *args, **kwargs):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.cart = Cart()  # Create an instance of the Cart class
+
+        label = ttk.Label(self, text="Order Items", font=LARGEFONT)
+        label.grid(row=0, column=3, padx=10, pady=10)
+
+        for index, item in enumerate(items_list, start=1):
+            formatted_item_name = f"{item['name']}"
+            formatted_item_price = f"${item['price']:.2f}"
+
+            label_item_name = ttk.Label(self, text=formatted_item_name, foreground='blue')
+            label_item_price = ttk.Label(self, text=formatted_item_price, foreground='green')
+
+            label_item_name.grid(row=index, column=3, padx=10, pady=5)
+            label_item_price.grid(row=index, column=4, padx=10, pady=5)
+
+        button_back = ttk.Button(self, text="Go Back", command=lambda: controller.show_frame(StartPage))
+        button_back.grid(row=18, column=4, columnspan=2, padx=0, pady=0)
+
+        self.label_name = ttk.Label(self, text='Item Name:')
+        self.label_name.grid(row=17, column=3, padx=0, pady=8)
+
+        self.entry_name = tk.Entry(self)
+        self.entry_name.grid(row=17, column=4, padx=0, pady=8)
+
+        button_add_item = ttk.Button(self, text="Add Item", command=self.add_item_to_cart)
+        button_add_item.grid(row=18, column=3, padx=0, pady=0)
+
+    def add_item_to_cart(self):
+        item_name = self.entry_name.get()
+        item_search = ItemSearch(itemsList)
+        result = item_search.search_item(item_name)
+
+        if not item_name:
+            messagebox.showerror('Error', 'Please enter an item name.')
+        elif result:
+            if item_name in self.cart.orderList:
+                messagebox.showerror('Error', f'{item_name} is already in the cart.')
+            else:
+                self.cart.add_item(item_name)
+                messagebox.showinfo('Item Added', f'{item_name} added to the cart!')
+        else:
+            messagebox.showerror('Error', f'{item_name} not found.')
+
+
 # Driver Code
 app = tkinterApp()
 app.mainloop()
