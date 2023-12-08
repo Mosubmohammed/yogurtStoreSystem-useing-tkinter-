@@ -402,7 +402,7 @@ class Page5(tk.Frame):
             label_item_price.grid(row=index, column=4, padx=10, pady=5)
 
         button_back = ttk.Button(self, text="Go Back", command=lambda: controller.show_frame(StartPage))
-        button_back.grid(row=18, column=4, columnspan=2, padx=0, pady=0)
+        button_back.grid(row=19, column=3, padx=0, pady=0)
 
         self.label_name = ttk.Label(self, text='Item Name:')
         self.label_name.grid(row=17, column=3, padx=0, pady=8)
