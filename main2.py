@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-
 itemsList = [
     {'name': 'LABNEH', 'price': 2.99},
     {'name': 'MILK', 'price': 1.50},
@@ -139,96 +138,128 @@ class tkinterApp(tk.Tk):
         frame.tkraise()
 
         if cont == Page3:
-            self.geometry("300x165")  # Adjust the height as needed for Page3
+            self.geometry("300x320")  # Adjust the height as needed for Page3
         elif cont == Page1:
             self.geometry("300x330")
         elif cont == Page2:
-            self.geometry("300x200")
+            self.geometry("300x320")
         elif cont == Page4:
-            self.geometry("250x500")
+            self.geometry("300x500")
         elif cont == Page5:
             self.geometry("300x600")    
         elif cont == StartPage:
-            self.geometry("240x240")    
+            self.geometry("300x320")    
         else:
             self.geometry("300x318")
+from tkinter import PhotoImage
+
 class StartPage(tk.Frame):
     def __init__(self, parent, controller, *args, **kwargs):
         tk.Frame.__init__(self, parent)
-        
 
-        label = ttk.Label(self, text="Welcome to our store", font=LARGEFONT)
-        label.grid(row=0, column=6, padx=0, pady=0)
+        # Load the background image
+        image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
+        background_image = PhotoImage(file=image_path)
+        
+        # Resize the image by subsampling (adjust the factors as needed)
+        subsample_factor = 3  # Adjust this factor as needed
+        background_image = background_image.subsample(subsample_factor, subsample_factor)
+
+        background_label = ttk.Label(self, image=background_image)
+        background_label.place(relwidth=1, relheight=1)
+
+        label = ttk.Label(self, text="Welcome to our store", font=LARGEFONT,foreground='#4682B4')
+        label.place(relx=0.5, rely=0.1, anchor="center")
+
+        # Calculate the vertical spacing between buttons
+        button_spacing = 0.08
 
         button1 = ttk.Button(
             self, text="CREATE NEW ACCOUNT", command=lambda: controller.show_frame(Page1)
         )
-        button1.grid(row=1, column=6, padx=0, pady=5)
-
+        button1.place(relx=0.5, rely=0.2, anchor="center")
+        
         button2 = ttk.Button(
             self, text="LOGIN to your account", command=lambda: controller.show_frame(Page2)
         )
-        button2.grid(row=2, column=6, padx=0, pady=5)
+        button2.place(relx=0.5, rely=0.2 + button_spacing, anchor="center")
 
         button3 = ttk.Button(
             self, text="SEARCH FOR ITEMS", command=lambda: controller.show_frame(Page3)
         )
-        button3.grid(row=3, column=6, padx=0, pady=5)
+        button3.place(relx=0.5, rely=0.2 + 2 * button_spacing, anchor="center")
 
         button4 = ttk.Button(
             self, text="VIEW THE ITEMS", command=lambda: controller.show_frame(Page4)
         )
-        button4.grid(row=4, column=6, padx=0, pady=5)
+        button4.place(relx=0.5, rely=0.2 + 3 * button_spacing, anchor="center")
 
         button5 = ttk.Button(
             self, text="ORDER", command=lambda: controller.show_frame(Page5)
         )
-        button5.grid(row=5, column=6, padx=0, pady=5)
+        button5.place(relx=0.5, rely=0.2 + 4 * button_spacing, anchor="center")
 
         button6 = ttk.Button(
             self, text="Cart", command=lambda: controller.show_frame(Page6)
         )
-        button6.grid(row=6, column=6, padx=0, pady=5)
+        button6.place(relx=0.5, rely=0.2 + 5 * button_spacing, anchor="center")
+
+        # Keep a reference to the image to prevent it from being garbage collected
+        self.background_image = background_image
 
 
 class Page1(tk.Frame):
     def __init__(self, parent, controller, customers_acc):
         self.customers_acc = customers_acc
         tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text="Create New Account", font=LARGEFONT)
+        
+        image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
+        background_image = PhotoImage(file=image_path)
+        
+        # Resize the image by subsampling (adjust the factors as needed)
+        subsample_factor = 3  # Adjust this factor as needed
+        background_image = background_image.subsample(subsample_factor, subsample_factor)
+
+        background_label = ttk.Label(self, image=background_image)
+        background_label.place(relwidth=1, relheight=1)
+
+        label = ttk.Label(self, text="Create New Account", font=LARGEFONT, foreground='#4682B4')
         label.grid(row=0, column=2, padx=5, pady=5)
 
-        self.label_name = ttk.Label(self, text='Name:')
+        self.label_name = ttk.Label(self, text='Name:', foreground='#4682B4')
         self.label_name.grid(row=6, column=1, padx=8, pady=8)
 
         self.entry_name = tk.Entry(self)
         self.entry_name.grid(row=6, column=2, padx=8, pady=8)
+        self.entry_name.config(validate='key', validatecommand=(self.register(self.validate_name), '%P'))
 
-        self.label_age = tk.Label(self, text='Age:')
+        self.label_age = tk.Label(self, text='Age:', foreground='#4682B4')
         self.label_age.grid(row=7, column=1, padx=8, pady=8)
 
         self.entry_age = tk.Entry(self)
         self.entry_age.grid(row=7, column=2, padx=8, pady=8)
+        self.entry_age.config(validate='key', validatecommand=(self.register(self.validate_age), '%P'))
 
-        self.label_phone = tk.Label(self, text='Phone:')
+        self.label_phone = tk.Label(self, text='Phone:', foreground='#4682B4')
         self.label_phone.grid(row=8, column=1, padx=8, pady=8)
 
         self.entry_phone = tk.Entry(self)
         self.entry_phone.grid(row=8, column=2, padx=8, pady=8)
+        self.entry_phone.config(validate='key', validatecommand=(self.register(self.validate_phone), '%P'))
 
-        self.label_address = tk.Label(self, text='Address:')
+        self.label_address = tk.Label(self, text='Address:', foreground='#4682B4')
         self.label_address.grid(row=9, column=1, padx=8, pady=8)
 
         self.entry_address = tk.Entry(self)
         self.entry_address.grid(row=9, column=2, padx=8, pady=8)
 
-        self.label_email = tk.Label(self, text='Email:')
+        self.label_email = tk.Label(self, text='Email:', foreground='#4682B4')
         self.label_email.grid(row=10, column=1, padx=8, pady=8)
 
         self.entry_email = tk.Entry(self)
         self.entry_email.grid(row=10, column=2, padx=8, pady=8)
 
-        self.label_password = tk.Label(self, text='Password:')
+        self.label_password = tk.Label(self, text='Password:', foreground='#4682B4')
         self.label_password.grid(row=11, column=1, padx=8, pady=8)
 
         self.entry_password = tk.Entry(self, show='*')  # Password entry with '*' as a show character
@@ -239,6 +270,7 @@ class Page1(tk.Frame):
 
         button3 = ttk.Button(self, text="GoBack", command=lambda: controller.show_frame(StartPage))
         button3.grid(row=13, column=2, padx=0, pady=0)
+        self.background_image = background_image
 
     def create_account(self, controller):
         name = self.entry_name.get()
@@ -247,6 +279,11 @@ class Page1(tk.Frame):
         address = self.entry_address.get()
         email = self.entry_email.get()
         password = self.entry_password.get()
+
+        # Check if any of the fields is empty
+        if not name or not age or not phone or not address or not email or not password:
+            messagebox.showerror('Error', 'Please fill in all fields.')
+            return
 
         customer = Customer(name, age, phone, address, email, password)
         self.customers_acc.addCustomer(customer)
@@ -281,6 +318,19 @@ class Page1(tk.Frame):
         self.label_password.grid(row=11, column=1, padx=10, pady=10)
         self.entry_password.grid(row=11, column=2, padx=10, pady=10)
 
+    def validate_name(self, value):
+        return all(char.isalpha() or char.isspace() for char in value)
+
+    def validate_age(self, value):
+        try:
+            # Attempt to convert the input value to an integer
+            age = int(value)
+            return 0 <= age <= 150  # Allow ages between 0 and 150
+        except ValueError:
+            return False  # If the conversion fails, return False
+
+    def validate_phone(self, value):
+        return value.isdigit()
 
 
 class Page2(tk.Frame):
@@ -289,16 +339,28 @@ class Page2(tk.Frame):
         self.customers_acc = customers_acc
         self.controller = controller
 
-        label = ttk.Label(self, text="Login", font=LARGEFONT)
+        image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
+        background_image = PhotoImage(file=image_path)
+        
+        # Resize the image by subsampling (adjust the factors as needed)
+        subsample_factor = 3  # Adjust this factor as needed
+        background_image = background_image.subsample(subsample_factor, subsample_factor)
+
+        background_label = ttk.Label(self, image=background_image)
+        background_label.place(relwidth=1, relheight=1)
+        self.background_image = background_image
+
+
+        label = ttk.Label(self, text="Login", font=LARGEFONT,foreground='#4682B4')
         label.grid(row=0, column=2, padx=10, pady=10)
 
-        label_name = ttk.Label(self, text='Email:')
+        label_name = ttk.Label(self, text='Email:',foreground='#4682B4')
         label_name.grid(row=6, column=1, padx=10, pady=10)
 
         entry_name = tk.Entry(self)
         entry_name.grid(row=6, column=2, padx=10, pady=10)
 
-        label_password = tk.Label(self, text='Password:')
+        label_password = tk.Label(self, text='Password:',foreground='#4682B4')
         label_password.grid(row=7, column=1, padx=10, pady=10)
 
         entry_password = tk.Entry(self, show='*')  # Password entry with '*' as a show character
@@ -329,23 +391,42 @@ class Page3(tk.Frame):
         self.controller = controller
         self.items_list = items_list
 
-        label = ttk.Label(self, text="SEARCH FOR ITEMS", font=LARGEFONT)
+        # Use a more darker shade of blue
+        style = ttk.Style()
+        style.configure('TButton', background='#4682B4', foreground='#4682B4')
+
+        image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
+        background_image = PhotoImage(file=image_path)
+
+        # Resize the image by subsampling (adjust the factors as needed)
+        subsample_factor = 3  # Adjust this factor as needed
+        background_image = background_image.subsample(subsample_factor, subsample_factor)
+
+        background_label = ttk.Label(self, image=background_image)
+        background_label.place(relwidth=1, relheight=1)
+
+        self.background_image = background_image
+
+        label = ttk.Label(self, text="SEARCH FOR ITEMS", font=LARGEFONT, foreground='#4682B4')
         label.grid(row=0, column=2, padx=10, pady=10)
 
-        self.label_search = ttk.Label(self, text='Item Name:')
+        self.label_search = ttk.Label(self, text='Item Name:', foreground='#4682B4')
         self.label_search.grid(row=2, column=1, padx=5, pady=0)
 
         self.entry_search = tk.Entry(self)
         self.entry_search.grid(row=2, column=2, padx=0, pady=0)
 
-        button_search = ttk.Button(self, text="SEARCH", command=self.search)
+        button_search = ttk.Button(self, text="SEARCH", command=self.search, style='TButton')
         button_search.grid(row=4, column=2, padx=10, pady=10)
+
         self.result_var = tk.StringVar()
-        label_result = tk.Label(self, textvariable=self.result_var)
+        label_result = tk.Label(self, textvariable=self.result_var, foreground='#4682B4')
         label_result.grid(row=5, column=1, padx=0, pady=0)
 
-        button2 = ttk.Button(self, text="GoBack", command=lambda: controller.show_frame(StartPage))
+        button2 = ttk.Button(self, text="GoBack", command=lambda: controller.show_frame(StartPage), style='TButton')
         button2.grid(row=5, column=2, padx=1, pady=1)
+
+
 
     def search(self):
         search_query = self.entry_search.get()
@@ -364,11 +445,23 @@ class Page4(tk.Frame):
         label = ttk.Label(self, text="Menu", font=LARGEFONT)
         label.grid(row=0, column=4, padx=10, pady=10)
 
+        image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
+        background_image = PhotoImage(file=image_path)
+        
+        # Resize the image by subsampling (adjust the factors as needed)
+        subsample_factor = 2  # Adjust this factor as needed
+        background_image = background_image.subsample(subsample_factor, subsample_factor)
+
+        background_label = ttk.Label(self, image=background_image)
+        background_label.place(relwidth=1, relheight=1)
+
+        self.background_image = background_image
+
         for index, item in enumerate(items_list, start=1):
             formatted_item_name = f"{item['name']}"
             formatted_item_price = f"${item['price']:.2f}"
 
-            label_item_name = ttk.Label(self, text=formatted_item_name, foreground='blue')
+            label_item_name = ttk.Label(self, text=formatted_item_name, foreground='#4682B4')
             label_item_price = ttk.Label(self, text=formatted_item_price, foreground='green')
 
             label_item_name.grid(row=index, column=4, padx=10, pady=5)
@@ -388,23 +481,35 @@ class Page5(tk.Frame):
         self.page6_frame = page6_frame
         self.items_list = items_list  # Store items_list as an attribute
 
-        label = ttk.Label(self, text="Order Items", font=LARGEFONT)
+        image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
+        background_image = PhotoImage(file=image_path)
+        
+        # Resize the image by subsampling (adjust the factors as needed)
+        subsample_factor = 1  # Adjust this factor as needed
+        background_image = background_image.subsample(subsample_factor, subsample_factor)
+
+        background_label = ttk.Label(self, image=background_image)
+        background_label.place(relwidth=1, relheight=1)
+
+        self.background_image = background_image
+
+        label = ttk.Label(self, text="Order Items", foreground='#4682B4')
         label.grid(row=0, column=3, padx=10, pady=10)
 
         for index, item in enumerate(items_list, start=1):
             formatted_item_name = f"{item['name']}"
             formatted_item_price = f"${item['price']:.2f}"
 
-            label_item_name = ttk.Label(self, text=formatted_item_name, foreground='blue')
+            label_item_name = ttk.Label(self, text=formatted_item_name, foreground='#4682B4')
             label_item_price = ttk.Label(self, text=formatted_item_price, foreground='green')
 
             label_item_name.grid(row=index, column=3, padx=10, pady=5)
             label_item_price.grid(row=index, column=4, padx=10, pady=5)
 
         button_back = ttk.Button(self, text="Go Back", command=lambda: controller.show_frame(StartPage))
-        button_back.grid(row=19, column=3, padx=0, pady=0)
+        button_back.grid(row=19, column=3, padx=5, pady=5)
 
-        self.label_name = ttk.Label(self, text='Item Name:')
+        self.label_name = ttk.Label(self, text='Item Name:', foreground='#4682B4')
         self.label_name.grid(row=17, column=3, padx=0, pady=8)
 
         self.entry_name = tk.Entry(self)
@@ -442,6 +547,18 @@ class Page6(tk.Frame):
         self.controller = controller
         self.cart = cart
         self.items_list = items_list  # Store items_list as an attribute
+
+        image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
+        background_image = PhotoImage(file=image_path)
+        
+        # Resize the image by subsampling (adjust the factors as needed)
+        subsample_factor = 3  # Adjust this factor as needed
+        background_image = background_image.subsample(subsample_factor, subsample_factor)
+
+        background_label = ttk.Label(self, image=background_image)
+        background_label.place(relwidth=1, relheight=1)
+
+        self.background_image = background_image
 
         label = ttk.Label(self, text="Your Cart", font=LARGEFONT)
         label.grid(row=0, column=3, padx=10, pady=10)
