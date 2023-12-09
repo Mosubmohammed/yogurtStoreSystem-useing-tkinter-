@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import PhotoImage
 itemsList = [
     {'name': 'LABNEH', 'price': 2.99},
     {'name': 'MILK', 'price': 1.50},
@@ -44,7 +45,7 @@ class LoginAccount(Customer):
     def searchForCustomers(self, customers_acc):
         for customer in customers_acc.customersList:
             if self.email == customer.email and self._Customer__password == customer._Customer__password:
-                messagebox.showinfo('Welcome', 'Welcome back!')
+                messagebox.showinfo('Welcome', 'Welcome to our store')
                 if self.callback:
                     self.callback()  # Call the callback function if provided
                 return
@@ -110,28 +111,21 @@ class tkinterApp(tk.Tk):
         self.frames = {}
         customers_acc = CustomersAcc()  # Move the CustomersAcc instantiation here
         cart = Cart()  # Create a single instance of the Cart class
+        self.page6_frame = None  # Initialize self.page6_frame to None
 
         for F in (StartPage, Page1, Page2, Page3, Page4, Page5, Page6):
             if F == Page1:
                 frame = F(container, self, customers_acc)  # Pass customers_acc only
             elif F == Page5:
-                page6_frame = Page6(container, self, itemsList, customers_acc, cart)  # Create an instance of Page6
-                frame = F(container, self, itemsList, customers_acc, page6_frame, cart)  # Pass itemsList, customers_acc, and cart
-                self.page6_frame = page6_frame  # Store the instance as an attribute
-
-
-
-
+                frame = F(container, self, itemsList, customers_acc, self.page6_frame, cart)
+                self.page6_frame = frame  # Store the instance as an attribute
             else:
                 frame = F(container, self, itemsList, customers_acc, cart)  # Pass itemsList, customers_acc, and cart
+
             self.frames[F] = frame 
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame(StartPage)
-
-
-
-
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -151,7 +145,8 @@ class tkinterApp(tk.Tk):
             self.geometry("300x320")    
         else:
             self.geometry("300x318")
-from tkinter import PhotoImage
+
+
 
 class StartPage(tk.Frame):
     def __init__(self, parent, controller, *args, **kwargs):
@@ -478,8 +473,8 @@ class Page5(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
         self.cart = cart
-        self.page6_frame = page6_frame
-        self.items_list = items_list  # Store items_list as an attribute
+        self.page6_frame = page6_frame  # Use the existing page6_frame
+        self.items_list = items_list   # Store items_list as an attribute
 
         image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
         background_image = PhotoImage(file=image_path)
@@ -519,25 +514,27 @@ class Page5(tk.Frame):
         button_add_item.grid(row=18, column=3, padx=0, pady=0)
 
     def add_item_to_cart(self):
-        item_name = self.entry_name.get()
-        item_search = ItemSearch(self.items_list)
-        result = item_search.search_item(item_name)
+            item_name = self.entry_name.get()
+            item_search = ItemSearch(self.items_list)
+            result = item_search.search_item(item_name)
 
-        if not item_name:
-            messagebox.showerror('Error', 'Please enter an item name.')
-        elif result:
-            if item_name in self.cart.orderList:
-                messagebox.showerror('Error', f'{item_name} is already in the cart.')
+            if not item_name:
+                messagebox.showerror('Error', 'Please enter an item name.')
+            elif result:
+                if item_name in self.cart.orderList:
+                    messagebox.showerror('Error', f'{item_name} is already in the cart.')
+                else:
+                    # Print item details to the console (you can replace this with your desired action)
+                    print(f'Item added to cart: {item_name} - Price: ${result["price"]:.2f}')
+
+                    # Add the item to the cart
+                    self.cart.add_item(item_name)
+
+                    # Update the order list in Page6
+                    if self.page6_frame:
+                        self.page6_frame.update_order_list(self.items_list)
             else:
-                
-                messagebox.showinfo('Item Added', f'{item_name} added to the cart!')
-                self.cart.add_item(item_name)
-                # Update the order list in Page6
-                if self.page6_frame:
-                    self.page6_frame.update_order_list(self.items_list)
-        else:
-            messagebox.showerror('Error', f'{item_name} not found.')
-
+                messagebox.showerror('Error', f'{item_name} not found.')
 
 
 
@@ -550,7 +547,7 @@ class Page6(tk.Frame):
 
         image_path = "C:\\Users\\mosup\\OneDrive\\Desktop\\cows-eating-grass-on-summer-pasture-landscape-vector-35428331.png"
         background_image = PhotoImage(file=image_path)
-        
+
         # Resize the image by subsampling (adjust the factors as needed)
         subsample_factor = 3  # Adjust this factor as needed
         background_image = background_image.subsample(subsample_factor, subsample_factor)
@@ -560,96 +557,35 @@ class Page6(tk.Frame):
 
         self.background_image = background_image
 
-        label = ttk.Label(self, text="Your Cart", font=LARGEFONT)
-        label.grid(row=0, column=3, padx=10, pady=10)
+        self.label_item_details = ttk.Label(self, text='', foreground='#4682B4')
+        self.label_item_details.grid(row=5, column=9, padx=0, pady=8)
 
-        self.order_list_var = tk.StringVar()
-        label_order_list = tk.Label(self, textvariable=self.order_list_var)
-        label_order_list.grid(row=1, column=3, padx=10, pady=5)
+        label = ttk.Label(self, text="Cart", foreground='#4682B4')
+        label.grid(row=0, column=10, padx=10, pady=10)
+
+        self.label_cart = tk.Label(self, text='Items in Cart:', foreground='#4682B4')
+        self.label_cart.grid(row=1, column=10, padx=0, pady=8)
+
+        self.listbox_cart = tk.Listbox(self, selectmode=tk.SINGLE)
+        self.listbox_cart.grid(row=2, column=10, padx=0, pady=0)
 
         button_back = ttk.Button(self, text="Go Back", command=lambda: controller.show_frame(StartPage))
-        button_back.grid(row=18, column=4, columnspan=2, padx=0, pady=0)
+        button_back.grid(row=3, column=10, padx=5, pady=5)
+
 
     def update_order_list(self, items_list):
-        order_list_text = "Your Cart:\n"
+    # Add the new items to the listbox without clearing the current items
         for item_name in self.cart.orderList:
-            result = ItemSearch(items_list).search_item(item_name)
+            result = next((item for item in items_list if item['name'] == item_name), None)
             if result:
-                order_list_text += f"{result['name']} - ${result['price']:.2f}\n"
-        
-        self.order_list_var.set(order_list_text)
+                item_info = f"{item_name}: ${result['price']:.2f}"
+                self.listbox_cart.insert(tk.END, item_info)
 
+                # Update the label with item details
+                self.label_item_details.config(text=f"Selected Item: {item_info}")
 
+                # Print item details to the console (you can replace this with your desired action)
+                print(f'Item added to cart: {item_info}')
 
-
-
-# class Page6(tk.Frame):
-    # def __init__(self, parent, controller, items_list, customers_acc, cart, *args, **kwargs):
-    #     tk.Frame.__init__(self, parent)
-    #     self.controller = controller
-    #     self.cart = cart
-
-    #     label = ttk.Label(self, text="Your Order's", font=LARGEFONT)
-    #     label.grid(row=0, column=3, padx=10, pady=10)
-
-    #     self.order_frame = tk.Frame(self)  # Frame to hold the order labels
-    #     self.order_frame.grid(row=1, column=3, padx=10, pady=10)
-
-    #     button_back = ttk.Button(self, text="Go Back", command=lambda: controller.show_frame(StartPage))
-    #     button_back.grid(row=2, column=3, padx=10, pady=10)
-
-    #     self.label_item_name_list = []  # Initialize the label list
-    #     self.label_item_price_list = []  # Initialize the label list
-
-    # def update_order_list(self, items_list, new_item_name=None):
-    #     # Clear existing labels
-    #     for label_name in self.label_item_name_list:
-    #         label_name.destroy()
-    #     for label_price in self.label_item_price_list:
-    #         label_price.destroy()
-
-    #     self.label_item_name_list = []
-    #     self.label_item_price_list = []
-
-    #     # Display the items in the cart
-    #     for index, item_name in enumerate(self.cart.orderList, start=1):
-    #         item = ItemSearch(items_list=items_list).search_item(item_name)
-
-    #         formatted_item_name = f"{item_name}"
-    #         formatted_item_price = f"${item['price']:.2f}" if item else "Price not available"
-
-    #         label_item_name = ttk.Label(self.order_frame, text=formatted_item_name, foreground='blue')
-    #         label_item_price = ttk.Label(self.order_frame, text=formatted_item_price, foreground='green')
-
-    #         label_item_name.grid(row=index, column=0, padx=10, pady=5)
-    #         label_item_price.grid(row=index, column=1, padx=10, pady=5)
-
-    #         self.label_item_name_list.append(label_item_name)
-    #         self.label_item_price_list.append(label_item_price)
-
-    #     # If a new item is provided, add it to the order list and update the display
-    #     if new_item_name:
-    #         self.cart.orderList.append(new_item_name)
-    #         formatted_new_item_name = f"{new_item_name}"
-    #         new_item = ItemSearch(items_list=items_list).search_item(new_item_name)
-    #         formatted_new_item_price = f"${new_item['price']:.2f}" if new_item else "Price not available"
-
-    #         label_new_item_name = ttk.Label(self.order_frame, text=formatted_new_item_name, foreground='blue')
-    #         label_new_item_price = ttk.Label(self.order_frame, text=formatted_new_item_price, foreground='green')
-
-    #         label_new_item_name.grid(row=len(self.cart.orderList), column=0, padx=10, pady=5)
-    #         label_new_item_price.grid(row=len(self.cart.orderList), column=1, padx=10, pady=5)
-
-    #         self.label_item_name_list.append(label_new_item_name)
-    #         self.label_item_price_list.append(label_new_item_price)
-
-    #     self.order_frame.update_idletasks()  # Force update the order_frame
-
-
-
-
-
-
-# Driver Code
 app = tkinterApp()
 app.mainloop()
