@@ -514,27 +514,30 @@ class Page5(tk.Frame):
         button_add_item.grid(row=18, column=3, padx=0, pady=0)
 
     def add_item_to_cart(self):
-            item_name = self.entry_name.get()
-            item_search = ItemSearch(self.items_list)
-            result = item_search.search_item(item_name)
+        item_name = self.entry_name.get()
+        item_search = ItemSearch(self.items_list)
+        result = item_search.search_item(item_name)
 
-            if not item_name:
-                messagebox.showerror('Error', 'Please enter an item name.')
-            elif result:
-                if item_name in self.cart.orderList:
-                    messagebox.showerror('Error', f'{item_name} is already in the cart.')
-                else:
-                    # Print item details to the console (you can replace this with your desired action)
-                    print(f'Item added to cart: {item_name} - Price: ${result["price"]:.2f}')
-
-                    # Add the item to the cart
-                    self.cart.add_item(item_name)
-
-                    # Update the order list in Page6
-                    if self.page6_frame:
-                        self.page6_frame.update_order_list(self.items_list)
+        if not item_name:
+            messagebox.showerror('Error', 'Please enter an item name.')
+        elif result:
+            if item_name in self.cart.orderList:
+                messagebox.showerror('Error', f'{item_name} is already in the cart.')
             else:
-                messagebox.showerror('Error', f'{item_name} not found.')
+                # Print item details to the console (you can replace this with your desired action)
+                print(f'Item added to cart: {item_name} - Price: ${result["price"]:.2f}')
+
+                # Add the item to the cart
+                self.cart.add_item(item_name)
+
+                # Update the order list in Page6
+                if self.page6_frame:
+                    self.page6_frame.update_order_list(self.items_list)
+
+                # Show a message that the item was added
+                messagebox.showinfo('Success', f'{item_name} added to the cart.')
+        else:
+            messagebox.showerror('Error', f'{item_name} not found.')
 
 
 
@@ -574,18 +577,20 @@ class Page6(tk.Frame):
 
 
     def update_order_list(self, items_list):
-    # Add the new items to the listbox without clearing the current items
+        # Add the new items to the listbox without clearing the current items
         for item_name in self.cart.orderList:
             result = next((item for item in items_list if item['name'] == item_name), None)
             if result:
                 item_info = f"{item_name}: ${result['price']:.2f}"
-                self.listbox_cart.insert(tk.END, item_info)
 
-                # Update the label with item details
-                self.label_item_details.config(text=f"Selected Item: {item_info}")
+                # Check if the item is already in the listbox
+                if item_info not in self.listbox_cart.get(0, tk.END):
+                    self.listbox_cart.insert(tk.END, item_info)
 
-                # Print item details to the console (you can replace this with your desired action)
-                print(f'Item added to cart: {item_info}')
+                    # Update the label with item details
+                    self.label_item_details.config(text=f"Selected Item: {item_info}")
 
+                    # Print item details to the console (you can replace this with your desired action)
+                    print(f'Item added to cart: {item_info}')
 app = tkinterApp()
 app.mainloop()
